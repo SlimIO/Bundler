@@ -1,6 +1,6 @@
 // Require Node.js Dependencies
 const {
-    promises: { access, readFile, writeFile, mkdir, copyFile },
+    promises: { access, readFile, writeFile, mkdir, copyFile, lstat },
     constants: { R_OK, W_OK }
 } = require("fs");
 const { join } = require("path");
@@ -8,6 +8,10 @@ const { join } = require("path");
 // Require Third-party Dependencies
 const Manifest = require("@slimio/manifest");
 const ncc = require("@zeit/ncc");
+const getDirSize = require("get-dir-size");
+const prettyBytes = require("pretty-bytes");
+const { yellow } = require("kleur");
+const { zip } = require("zip-a-folder");
 
 /**
  * @async
@@ -17,6 +21,8 @@ const ncc = require("@zeit/ncc");
  */
 async function createArchive(location) {
     await access(location, R_OK | W_OK);
+    const locationSize = await getDirSize(location);
+    console.log("Original size: ", yellow(prettyBytes(locationSize)));
 
     const packagePath = join(location, "package.json");
     const manifestPath = join(location, "slimio.toml");
@@ -57,6 +63,15 @@ async function createArchive(location) {
         copyFile(packagePath, join(archiveLocation, "package.json")),
         copyFile(manifestPath, join(archiveLocation, "slimio.toml"))
     ]);
+
+    const archiveSize = await getDirSize(archiveLocation);
+    console.log("Archive size (no compression): ", yellow(prettyBytes(archiveSize)));
+
+    const zipLocation = `${archiveLocation}.zip`;
+    await zip(archiveLocation, zipLocation);
+
+    const zipSize = await lstat(zipLocation);
+    console.log("Archive size (zipped): ", yellow(prettyBytes(zipSize.size)));
 }
 
 module.exports = { createArchive };
