@@ -1,3 +1,3 @@
 const { createArchive } = require(".");
 
-createArchive("F:\\Code\\SlimIO\\Agent\\addons\\alerting").catch(console.error);
+createArchive("F:\\Code\\SlimIO\\Agent\\addons\\events").catch(console.error);

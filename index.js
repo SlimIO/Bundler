@@ -11,7 +11,10 @@ const ncc = require("@zeit/ncc");
 const getDirSize = require("get-dir-size");
 const prettyBytes = require("pretty-bytes");
 const { yellow } = require("kleur");
-const { zip } = require("zip-a-folder");
+
+// Require Internal Dependencies
+const createBrotliArchive = require("./src/brotli");
+const { cleanRecursive } = require("./src/utils");
 
 /**
  * @async
@@ -60,15 +63,15 @@ async function createArchive(location) {
     // Add files to archive
     await Promise.all([
         writeFile(join(archiveLocation, "index.js"), code),
-        copyFile(packagePath, join(archiveLocation, "package.json")),
         copyFile(manifestPath, join(archiveLocation, "slimio.toml"))
     ]);
 
     const archiveSize = await getDirSize(archiveLocation);
     console.log("Archive size (no compression): ", yellow(prettyBytes(archiveSize)));
 
-    const zipLocation = `${archiveLocation}.zip`;
-    await zip(archiveLocation, zipLocation);
+    const zipLocation = `${archiveLocation}.tar`;
+    await createBrotliArchive(archiveLocation, zipLocation);
+    await cleanRecursive(archiveLocation);
 
     const zipSize = await lstat(zipLocation);
     console.log("Archive size (zipped): ", yellow(prettyBytes(zipSize.size)));
