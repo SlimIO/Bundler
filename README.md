@@ -22,7 +22,50 @@ $ yarn add @slimio/bundler
 TBC
 
 ## API
-TBC
+
+<details><summary>createArchive(location: string, options?: ArchiveOptions): Promise< string ></summary>
+<br />
+
+Create Addon archive.
+
+```js
+const { createArchive } = require("./index");
+
+createArchive("F:\\Code\\Agent\\addons\\alerting", {
+    debug: true
+}).catch(console.error);
+```
+
+</details>
+
+<details><summary>compileCore(location: string, options?: CoreOptions): Promise< string ></summary>
+<br />
+
+Compile the core. Options is described by the following interface
+```ts
+interface CoreOptions {
+    debug?: boolean;
+    cwd?: string;
+}
+```
+
+```js
+const { compileCore } = require("./index");
+const { mkdir } = require("fs").promises;
+const { join } = require("path");
+
+async function main() {
+    const cwd = join(__dirname, "build");
+
+    await mkdir(cwd);
+    await compileCore("F:\\Code\\AgentTest", {
+        debug: true, cwd
+    });
+}
+main().catch(console.error);
+```
+
+</details>
 
 ## License
 MIT
