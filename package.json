@@ -15,7 +15,12 @@
         "type": "git",
         "url": "git+https://github.com/SlimIO/Bundler.git"
     },
-    "keywords": [],
+    "keywords": [
+        "bundler",
+        "slimio",
+        "packager",
+        "back-dce"
+    ],
     "author": "SlimIO",
     "license": "MIT",
     "bugs": {
@@ -23,13 +28,13 @@
     },
     "homepage": "https://github.com/SlimIO/Bundler#readme",
     "dependencies": {
+        "@slimio/is": "^1.5.0",
         "@slimio/manifest": "^0.4.0",
         "@zeit/ncc": "^0.18.3",
         "get-dir-size": "^1.0.0",
-        "kleur": "^3.0.3",
+        "nexe": "^3.2.0",
         "pretty-bytes": "^5.2.0",
-        "tar-fs": "^2.0.0",
-        "zip-a-folder": "0.0.8"
+        "tar-fs": "^2.0.0"
     },
     "devDependencies": {
         "@commitlint/cli": "^7.6.1",

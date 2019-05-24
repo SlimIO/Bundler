@@ -10,28 +10,52 @@ const Manifest = require("@slimio/manifest");
 const ncc = require("@zeit/ncc");
 const getDirSize = require("get-dir-size");
 const prettyBytes = require("pretty-bytes");
-const { yellow } = require("kleur");
+const is = require("@slimio/is");
+const nexe = require("nexe");
 
 // Require Internal Dependencies
 const createBrotliArchive = require("./src/brotli");
 const { cleanRecursive } = require("./src/utils");
 
+// CONSTANTS
+const FILES_TO_COPY = new Set(["slimio.toml"]);
+
 /**
  * @async
  * @func createArchive
+ * @desc Create Addon archive
  * @param {!String} location Addon location
- * @returns {Promise<void>}
+ * @param {Object} [options] options
+ * @param {Boolean=} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @returns {Promise<String>}
+ *
+ * @throws {TypeError}
+ * @throws {Error}
  */
-async function createArchive(location) {
-    await access(location, R_OK | W_OK);
-    const locationSize = await getDirSize(location);
-    console.log("Original size: ", yellow(prettyBytes(locationSize)));
+async function createArchive(location, options = Object.create(null)) {
+    if (!is.string(location)) {
+        throw new TypeError("location must be a string");
+    }
+    if (!is.plainObject(options)) {
+        throw new TypeError("location must be a plain Object");
+    }
 
-    const packagePath = join(location, "package.json");
+    const { debug = false } = options;
+    if (!is.bool(debug)) {
+        throw new TypeError("debug must be a boolean");
+    }
+
+    await access(location, R_OK | W_OK);
+    if (debug) {
+        const bytesSize = await getDirSize(location);
+        console.log(`${location}: original size =>`, prettyBytes(bytesSize));
+    }
+
+    // Generate safe path
     const manifestPath = join(location, "slimio.toml");
 
     // Get Package.json and SlimIO Manifest file
-    const buf = await readFile(packagePath);
+    const buf = await readFile(join(location, "package.json"));
     const pkg = JSON.parse(buf.toString());
     const man = Manifest.open(manifestPath);
 
@@ -42,13 +66,13 @@ async function createArchive(location) {
     const { code } = await ncc(join(location, pkg.main), {
         cache: false,
         externals: [],
-        minify: true,
+        minify: false,
         sourceMap: false,
         sourceMapBasePrefix: "../",
-        sourceMapRegister: true,
+        sourceMapRegister: false,
         watch: false,
         v8cache: false,
-        quiet: false,
+        quiet: true,
         debugLog: false
     });
 
@@ -61,21 +85,76 @@ async function createArchive(location) {
     }
 
     // Add files to archive
-    await Promise.all([
-        writeFile(join(archiveLocation, "index.js"), code),
-        copyFile(manifestPath, join(archiveLocation, "slimio.toml"))
-    ]);
+    {
+        const pArr = [writeFile(join(archiveLocation, "index.js"), code)];
+        for (const fileName of FILES_TO_COPY) {
+            pArr.push(copyFile(manifestPath, join(archiveLocation, fileName)));
+        }
+        await Promise.all(pArr);
+    }
 
-    const archiveSize = await getDirSize(archiveLocation);
-    console.log("Archive size (no compression): ", yellow(prettyBytes(archiveSize)));
+    if (debug) {
+        const bytesSize = await getDirSize(archiveLocation);
+        console.log(`${archiveLocation}: archive (dir) size with no compression => `, prettyBytes(bytesSize));
+    }
 
-    const zipLocation = `${archiveLocation}.tar`;
+    const zipLocation = `${archiveLocation}-${pkg.version}.tar`;
     await createBrotliArchive(archiveLocation, zipLocation);
     await cleanRecursive(archiveLocation);
 
-    const zipSize = await lstat(zipLocation);
-    console.log("Archive size (zipped): ", yellow(prettyBytes(zipSize.size)));
+    if (debug) {
+        const stat = await lstat(zipLocation);
+        console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
+    }
+
+    return zipLocation;
 }
 
-module.exports = { createArchive };
+
+/**
+ * @async
+ * @func compileCore
+ * @desc Create Agent executable
+ * @param {!String} location Agent location
+ * @param {Object} [options] options
+ * @param {Boolean=} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @param {String=} [options.cwd] current working dir
+ * @returns {Promise<String>}
+ *
+ * @throws {TypeError}
+ */
+async function compileCore(location, options = Object.create(null)) {
+    if (!is.string(location)) {
+        throw new TypeError("location must be a string");
+    }
+    if (!is.plainObject(options)) {
+        throw new TypeError("location must be a plain Object");
+    }
+
+    const { debug = false, cwd = process.cwd() } = options;
+    if (!is.bool(debug)) {
+        throw new TypeError("debug must be a boolean");
+    }
+    if (!is.string(cwd)) {
+        throw new TypeError("cwd must be a boolean");
+    }
+
+    await access(location, R_OK | W_OK);
+    const input = join(location, "index.js");
+    if (debug) {
+        console.log(`agent index.js location: ${input}`);
+    }
+
+    await nexe.compile({
+        input,
+        output: "core",
+        verbose: true,
+        cwd,
+        targets: "windows-x64-10.15.0"
+    });
+
+    return join(cwd, "core.exe");
+}
+
+module.exports = { createArchive, compileCore };
 
