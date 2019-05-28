@@ -67,5 +67,17 @@ main().catch(console.error);
 
 </details>
 
+## Dependencies
+
+|Name|Refactoring|Security Risk|Usage|
+|---|---|---|---|
+|[@slimio/is](https://github.com/SlimIO/is#readme)|Minor|Low|Type checker|
+|[@slimio/manifest](https://github.com/SlimIO/Manifester#readme)|Minor|Low|SlimIO manifest|
+|[@zeit/ncc](https://github.com/zeit/ncc#readme)|⚠️Major|Low|Compiling a Node.js module into a single file|
+|[get-dir-size](https://github.com/fraxken/dir-size#readme)|Minor|Low|Get a directory size|
+|[nexe](https://github.com/nexe/nexe#readme)|⚠️Major|High|Create Node.js executable|
+|[pretty-bytes](https://github.com/sindresorhus/pretty-bytes#readme)|Minor|Low|Displaying file sizes for humans|
+|[tar-fs](https://github.com/mafintosh/tar-fs)|⚠️Major|High|Pack and unpack tar file|
+
 ## License
 MIT
