@@ -12,10 +12,10 @@ const getDirSize = require("get-dir-size");
 const prettyBytes = require("pretty-bytes");
 const is = require("@slimio/is");
 const nexe = require("nexe");
+const premove = require("premove");
 
 // Require Internal Dependencies
 const createBrotliArchive = require("./src/brotli");
-const { cleanRecursive } = require("./src/utils");
 
 // CONSTANTS
 const FILES_TO_COPY = new Set(["slimio.toml"]);
@@ -100,7 +100,7 @@ async function createArchive(location, options = Object.create(null)) {
 
     const zipLocation = `${archiveLocation}-${pkg.version}.tar`;
     await createBrotliArchive(archiveLocation, zipLocation);
-    await cleanRecursive(archiveLocation);
+    await premove(archiveLocation);
 
     if (debug) {
         const stat = await lstat(zipLocation);

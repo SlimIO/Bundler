@@ -11,9 +11,7 @@ const {
 
 // Require Third-party Dependencies
 const tar = require("tar-fs");
-
-// Require Internal Dependencies
-const { cleanRecursive } = require("./utils");
+const premove = require("premove");
 
 // Vars
 const pipeAsync = promisify(pipeline);
@@ -53,17 +51,13 @@ async function createBrotliArchive(location, out) {
         });
         await Promise.all(streamPromises);
 
-        await pipeAsync(
-            tar.pack(tempLocation), createWriteStream(out)
-        );
+        await pipeAsync(tar.pack(tempLocation), createWriteStream(out));
+        await premove(tempLocation);
     }
     catch (err) {
-        await cleanRecursive(tempLocation);
+        await premove(tempLocation);
 
         throw err;
-    }
-    finally {
-        await cleanRecursive(tempLocation);
     }
 }
 
