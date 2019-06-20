@@ -18,7 +18,7 @@ const premove = require("premove");
 const createBrotliArchive = require("./src/brotli");
 
 // CONSTANTS
-const FILES_TO_COPY = new Set(["slimio.toml"]);
+const FILES_TO_COPY = Object.freeze(["slimio.toml"]);
 
 /**
  * @async
