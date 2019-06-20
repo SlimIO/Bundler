@@ -26,7 +26,8 @@ const FILES_TO_COPY = new Set(["slimio.toml"]);
  * @desc Create Addon archive
  * @param {!String} location Addon location
  * @param {Object} [options] options
- * @param {Boolean=} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @param {Boolean} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @param {String} [options.dest] archive destination
  * @returns {Promise<String>}
  *
  * @throws {TypeError}
@@ -40,7 +41,7 @@ async function createArchive(location, options = Object.create(null)) {
         throw new TypeError("location must be a plain Object");
     }
 
-    const { debug = false } = options;
+    const { debug = false, dest = process.cwd() } = options;
     if (!is.bool(debug)) {
         throw new TypeError("debug must be a boolean");
     }
@@ -76,7 +77,7 @@ async function createArchive(location, options = Object.create(null)) {
         debugLog: false
     });
 
-    const archiveLocation = join(process.cwd(), `${man.name}-archive`);
+    const archiveLocation = join(dest, `${man.name}-archive`);
     try {
         await mkdir(archiveLocation);
     }
@@ -85,13 +86,10 @@ async function createArchive(location, options = Object.create(null)) {
     }
 
     // Add files to archive
-    {
-        const pArr = [writeFile(join(archiveLocation, "index.js"), code)];
-        for (const fileName of FILES_TO_COPY) {
-            pArr.push(copyFile(manifestPath, join(archiveLocation, fileName)));
-        }
-        await Promise.all(pArr);
-    }
+    await Promise.all([
+        writeFile(join(archiveLocation, "index.js"), code),
+        ...FILES_TO_COPY.map((file) => copyFile(manifestPath, join(archiveLocation, file)))
+    ]);
 
     if (debug) {
         const bytesSize = await getDirSize(archiveLocation);
@@ -99,12 +97,15 @@ async function createArchive(location, options = Object.create(null)) {
     }
 
     const zipLocation = `${archiveLocation}-${pkg.version}.tar`;
-    await createBrotliArchive(archiveLocation, zipLocation);
-    await premove(archiveLocation);
-
-    if (debug) {
-        const stat = await lstat(zipLocation);
-        console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
+    try {
+        await createBrotliArchive(archiveLocation, zipLocation);
+        if (debug) {
+            const stat = await lstat(zipLocation);
+            console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
+        }
+    }
+    finally {
+        await premove(archiveLocation);
     }
 
     return zipLocation;

@@ -1,6 +1,7 @@
 declare namespace Bundler {
     interface ArchiveOptions {
         debug?: boolean;
+        dest?: string;
     }
 
     interface CoreOptions {
