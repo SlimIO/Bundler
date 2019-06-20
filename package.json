@@ -28,7 +28,7 @@
     },
     "homepage": "https://github.com/SlimIO/Bundler#readme",
     "dependencies": {
-        "@slimio/is": "^1.5.0",
+        "@slimio/is": "^1.5.1",
         "@slimio/manifest": "^0.4.0",
         "@zeit/ncc": "^0.18.3",
         "get-dir-size": "^1.0.0",
