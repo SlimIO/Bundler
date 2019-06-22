@@ -1,6 +1,6 @@
 {
     "name": "@slimio/bundler",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "SlimIO Archive (Addon & Core) Bundler",
     "main": "index.js",
     "scripts": {
