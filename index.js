@@ -77,7 +77,7 @@ async function createArchive(location, options = Object.create(null)) {
         debugLog: false
     });
 
-    const archiveLocation = join(dest, `${man.name}-archive`);
+    const archiveLocation = join(dest, `${man.type}-${man.name}`);
     try {
         await mkdir(archiveLocation);
     }
