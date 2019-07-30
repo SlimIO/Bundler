@@ -1,3 +1,5 @@
+"use strict";
+
 // Require Node.js Dependencies
 const zlib = require("zlib");
 const { join } = require("path");
@@ -17,9 +19,9 @@ const premove = require("premove");
 const pipeAsync = promisify(pipeline);
 
 /**
- * @func createBrotliArchive
- * @param {!String} location location
- * @param {!String} out output archive
+ * @function createBrotliArchive
+ * @param {!string} location location
+ * @param {!string} out output archive
  * @returns {Promise<void>}
  */
 async function createBrotliArchive(location, out) {

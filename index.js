@@ -1,3 +1,5 @@
+"use strict";
+
 // Require Node.js Dependencies
 const {
     promises: { access, readFile, writeFile, mkdir, copyFile, lstat },
@@ -22,13 +24,13 @@ const FILES_TO_COPY = Object.freeze(["slimio.toml"]);
 
 /**
  * @async
- * @func createArchive
- * @desc Create Addon archive
- * @param {!String} location Addon location
- * @param {Object} [options] options
- * @param {Boolean} [options.debug=false] enable debug (stdout size and location to TTY)
- * @param {String} [options.dest] archive destination
- * @returns {Promise<String>}
+ * @function createArchive
+ * @description Create Addon archive
+ * @param {!string} location Addon location
+ * @param {object} [options] options
+ * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @param {string} [options.dest] archive destination
+ * @returns {Promise<string>}
  *
  * @throws {TypeError}
  * @throws {Error}
@@ -114,13 +116,13 @@ async function createArchive(location, options = Object.create(null)) {
 
 /**
  * @async
- * @func compileCore
- * @desc Create Agent executable
- * @param {!String} location Agent location
- * @param {Object} [options] options
- * @param {Boolean=} [options.debug=false] enable debug (stdout size and location to TTY)
- * @param {String=} [options.cwd] current working dir
- * @returns {Promise<String>}
+ * @function compileCore
+ * @description Create Agent executable
+ * @param {!string} location Agent location
+ * @param {object} [options] options
+ * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
+ * @param {string} [options.cwd] current working dir
+ * @returns {Promise<string>}
  *
  * @throws {TypeError}
  */
