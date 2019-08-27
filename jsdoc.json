@@ -7,8 +7,6 @@
     },
     "source": {
         "include": [
-            "./src/brotli.js",
-            "./src/utils.js",
             "index.js"
         ],
         "exclude": [
