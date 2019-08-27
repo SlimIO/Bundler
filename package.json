@@ -39,8 +39,7 @@
         "@slimio/tarball": "^0.1.0",
         "get-dir-size": "^1.0.0",
         "nexe": "^3.3.1",
-        "pretty-bytes": "^5.2.0",
-        "tar-fs": "^2.0.0"
+        "pretty-bytes": "^5.2.0"
     },
     "devDependencies": {
         "@commitlint/cli": "^8.0.0",

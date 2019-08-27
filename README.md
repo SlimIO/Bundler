@@ -73,7 +73,6 @@ generateCoreExecutable("F:\\Code\\AgentTest", {
 |[get-dir-size](https://github.com/fraxken/dir-size#readme)|Minor|Low|Get a directory size|
 |[nexe](https://github.com/nexe/nexe#readme)|⚠️Major|High|Create Node.js executable|
 |[pretty-bytes](https://github.com/sindresorhus/pretty-bytes#readme)|Minor|Low|Displaying file sizes for humans|
-|[tar-fs](https://github.com/mafintosh/tar-fs)|⚠️Major|High|Pack and unpack tar file|
 
 ## License
 MIT
