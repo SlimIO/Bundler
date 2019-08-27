@@ -34,7 +34,7 @@
     "dependencies": {
         "@slimio/arg-checker": "^0.1.1",
         "@slimio/is": "^1.5.1",
-        "@slimio/manifest": "^0.7.0",
+        "@slimio/manifest": "^0.7.1",
         "@slimio/tarball": "^0.1.0",
         "get-dir-size": "^1.0.0",
         "nexe": "^3.3.1",
