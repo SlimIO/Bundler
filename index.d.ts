@@ -9,8 +9,8 @@ declare namespace Bundler {
         cwd?: string;
     }
 
-    export function createArchive(location: string, options?: ArchiveOptions): Promise<string>;
-    export function compileCore(location: string, options?: CoreOptions): Promise<string>;
+    export function generateAddonArchive(location: string, options?: ArchiveOptions): Promise<string>;
+    export function generateCoreExecutable(location: string, options?: CoreOptions): Promise<string>;
 }
 
 export as namespace Bundler;

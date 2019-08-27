@@ -3,7 +3,7 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SlimIO/is/commit-activity)
 ![MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-SlimIO Archive (Addon & Core) Bundler
+SlimIO Archive bundler & Core compiler.
 
 ## Requirements
 - [Node.js](https://nodejs.org/en/) v10 or higher
@@ -23,22 +23,22 @@ TBC
 
 ## API
 
-<details><summary>createArchive(location: string, options?: ArchiveOptions): Promise< string ></summary>
+<details><summary>generateAddonArchive(location: string, options?: ArchiveOptions): Promise< string ></summary>
 <br />
 
 Create Addon archive.
 
 ```js
-const { createArchive } = require("./index");
+const { generateAddonArchive } = require("@slimio/bundler");
 
-createArchive("F:\\Code\\Agent\\addons\\alerting", {
+generateAddonArchive("F:\\Code\\Agent\\addons\\alerting", {
     debug: true
 }).catch(console.error);
 ```
 
 </details>
 
-<details><summary>compileCore(location: string, options?: CoreOptions): Promise< string ></summary>
+<details><summary>generateCoreExecutable(location: string, options?: CoreOptions): Promise< string ></summary>
 <br />
 
 Compile the core. Options is described by the following interface
@@ -50,19 +50,14 @@ interface CoreOptions {
 ```
 
 ```js
-const { compileCore } = require("./index");
-const { mkdir } = require("fs").promises;
+const { generateCoreExecutable } = require("@slimio/bundler");
 const { join } = require("path");
 
-async function main() {
-    const cwd = join(__dirname, "build");
-
-    await mkdir(cwd);
-    await compileCore("F:\\Code\\AgentTest", {
-        debug: true, cwd
+generateCoreExecutable("F:\\Code\\AgentTest", {
+        debug: true,
+        cwd: join(__dirname, "build")
     });
-}
-main().catch(console.error);
+}).then(() => console.log("core compiled")).catch(console.error);
 ```
 
 </details>
@@ -71,9 +66,10 @@ main().catch(console.error);
 
 |Name|Refactoring|Security Risk|Usage|
 |---|---|---|---|
+|[@slimio/arg-checker](https://github.com/SlimIO/arg-checker)|Minor|Low|Argument Checker|
 |[@slimio/is](https://github.com/SlimIO/is#readme)|Minor|Low|Type checker|
 |[@slimio/manifest](https://github.com/SlimIO/Manifester#readme)|Minor|Low|SlimIO manifest|
-|[@zeit/ncc](https://github.com/zeit/ncc#readme)|⚠️Major|Low|Compiling a Node.js module into a single file|
+|[@slimio/tarball](https://github.com/SlimIO/Tarball)|⚠️Major|High|SlimIO Addon & module archive tarball packer/extractor|
 |[get-dir-size](https://github.com/fraxken/dir-size#readme)|Minor|Low|Get a directory size|
 |[nexe](https://github.com/nexe/nexe#readme)|⚠️Major|High|Create Node.js executable|
 |[pretty-bytes](https://github.com/sindresorhus/pretty-bytes#readme)|Minor|Low|Displaying file sizes for humans|

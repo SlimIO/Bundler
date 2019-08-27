@@ -1,30 +1,33 @@
 "use strict";
 
 // Require Node.js Dependencies
-const {
-    promises: { access, readFile, writeFile, mkdir, copyFile, lstat },
-    constants: { R_OK, W_OK }
-} = require("fs");
+const { promises: { lstat, mkdir }, constants: { R_OK, W_OK } } = require("fs");
 const { join } = require("path");
 
 // Require Third-party Dependencies
 const Manifest = require("@slimio/manifest");
-const ncc = require("@zeit/ncc");
 const getDirSize = require("get-dir-size");
 const prettyBytes = require("pretty-bytes");
 const is = require("@slimio/is");
 const nexe = require("nexe");
-const premove = require("premove");
-
-// Require Internal Dependencies
-const createBrotliArchive = require("./src/brotli");
-
-// CONSTANTS
-const FILES_TO_COPY = Object.freeze(["slimio.toml"]);
+const tarball = require("@slimio/tarball");
+const argc = require("@slimio/arg-checker");
 
 /**
  * @async
- * @function createArchive
+ * @function
+ * @param {!string} location dir location
+ * @returns {string}
+ */
+async function sizeOf(location) {
+    const sizeInBytes = await getDirSize(location);
+
+    return prettyBytes(sizeInBytes);
+}
+
+/**
+ * @async
+ * @function generateAddonArchive
  * @description Create Addon archive
  * @param {!string} location Addon location
  * @param {object} [options] options
@@ -35,79 +38,27 @@ const FILES_TO_COPY = Object.freeze(["slimio.toml"]);
  * @throws {TypeError}
  * @throws {Error}
  */
-async function createArchive(location, options = Object.create(null)) {
-    if (!is.string(location)) {
-        throw new TypeError("location must be a string");
-    }
-    if (!is.plainObject(options)) {
-        throw new TypeError("location must be a plain Object");
-    }
+async function generateAddonArchive(location, options = Object.create(null)) {
+    argc(location, is.string);
+    argc(options, is.plainObject);
 
     const { debug = false, dest = process.cwd() } = options;
-    if (!is.bool(debug)) {
-        throw new TypeError("debug must be a boolean");
-    }
+    argc(debug, is.bool);
+    argc(dest, is.string);
 
     await access(location, R_OK | W_OK);
     if (debug) {
-        const bytesSize = await getDirSize(location);
-        console.log(`${location}: original size =>`, prettyBytes(bytesSize));
+        console.log(`${location}: original size => `, await sizeOf(location));
     }
 
-    // Generate safe path
-    const manifestPath = join(location, "slimio.toml");
+    // Read manifest
+    const man = Manifest.open(join(location, "slimio.toml"));
 
-    // Get Package.json and SlimIO Manifest file
-    const buf = await readFile(join(location, "package.json"));
-    const pkg = JSON.parse(buf.toString());
-    const man = Manifest.open(manifestPath);
-
-    if (!Reflect.has(pkg, "main")) {
-        throw new Error("Unable to found 'main' field in package.json");
-    }
-
-    const { code } = await ncc(join(location, pkg.main), {
-        cache: false,
-        externals: [],
-        minify: false,
-        sourceMap: false,
-        sourceMapBasePrefix: "../",
-        sourceMapRegister: false,
-        watch: false,
-        v8cache: false,
-        quiet: true,
-        debugLog: false
-    });
-
-    const archiveLocation = join(dest, `${man.type}-${man.name}`);
-    try {
-        await mkdir(archiveLocation);
-    }
-    catch (err) {
-        // Ignore
-    }
-
-    // Add files to archive
-    await Promise.all([
-        writeFile(join(archiveLocation, "index.js"), code),
-        ...FILES_TO_COPY.map((file) => copyFile(manifestPath, join(archiveLocation, file)))
-    ]);
-
+    const zipLocation = `Addon-${man.name}-${man.version}.tar`;
+    await tarball.pack(location, zipLocation);
     if (debug) {
-        const bytesSize = await getDirSize(archiveLocation);
-        console.log(`${archiveLocation}: archive (dir) size with no compression => `, prettyBytes(bytesSize));
-    }
-
-    const zipLocation = `${archiveLocation}-${pkg.version}.tar`;
-    try {
-        await createBrotliArchive(archiveLocation, zipLocation);
-        if (debug) {
-            const stat = await lstat(zipLocation);
-            console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
-        }
-    }
-    finally {
-        await premove(archiveLocation);
+        const stat = await lstat(zipLocation);
+        console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
     }
 
     return zipLocation;
@@ -116,8 +67,8 @@ async function createArchive(location, options = Object.create(null)) {
 
 /**
  * @async
- * @function compileCore
- * @description Create Agent executable
+ * @function generateCoreExecutable
+ * @description Bundle the core and Node.js into an executable
  * @param {!string} location Agent location
  * @param {object} [options] options
  * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
@@ -126,27 +77,22 @@ async function createArchive(location, options = Object.create(null)) {
  *
  * @throws {TypeError}
  */
-async function compileCore(location, options = Object.create(null)) {
-    if (!is.string(location)) {
-        throw new TypeError("location must be a string");
-    }
-    if (!is.plainObject(options)) {
-        throw new TypeError("location must be a plain Object");
-    }
+async function generateCoreExecutable(location, options = Object.create(null)) {
+    argc(location, is.string);
+    argc(options, is.plainObject);
 
     const { debug = false, cwd = process.cwd() } = options;
-    if (!is.bool(debug)) {
-        throw new TypeError("debug must be a boolean");
-    }
-    if (!is.string(cwd)) {
-        throw new TypeError("cwd must be a boolean");
-    }
+    argc(debug, is.bool);
+    argc(cwd, is.string);
 
     await access(location, R_OK | W_OK);
     const input = join(location, "index.js");
     if (debug) {
         console.log(`agent index.js location: ${input}`);
     }
+
+    // Mkdir cwd
+    await mkdir(cwd, { recursive: true });
 
     await nexe.compile({
         input,
@@ -159,5 +105,7 @@ async function compileCore(location, options = Object.create(null)) {
     return join(cwd, "core.exe");
 }
 
-module.exports = { createArchive, compileCore };
-
+module.exports = {
+    generateAddonArchive,
+    generateCoreExecutable
+};
