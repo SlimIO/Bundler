@@ -1,7 +1,10 @@
 "use strict";
 
 // Require Node.js Dependencies
-const { promises: { lstat, mkdir }, constants: { R_OK, W_OK } } = require("fs");
+const {
+    promises: { lstat, mkdir, access },
+    constants: { R_OK, W_OK }
+} = require("fs");
 const { join } = require("path");
 
 // Require Third-party Dependencies
