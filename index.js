@@ -58,13 +58,14 @@ async function generateAddonArchive(location, options = Object.create(null)) {
     const man = Manifest.open(join(location, "slimio.toml"));
 
     const zipLocation = `Addon-${man.name}-${man.version}.tar`;
-    await tarball.pack(location, zipLocation);
+    const zipDestination = join(dest, zipLocation);
+    await tarball.pack(location, zipDestination);
     if (debug) {
-        const stat = await lstat(zipLocation);
+        const stat = await lstat(zipDestination);
         console.log(`${zipLocation}: archive compressed .zip size => `, prettyBytes(stat.size));
     }
 
-    return zipLocation;
+    return zipDestination;
 }
 
 
