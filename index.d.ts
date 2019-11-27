@@ -1,3 +1,5 @@
+import { NexeTarget } from "nexe/lib/target";
+
 declare namespace Bundler {
     interface ArchiveOptions {
         debug?: boolean;
@@ -7,6 +9,7 @@ declare namespace Bundler {
     interface CoreOptions {
         debug?: boolean;
         cwd?: string;
+        targets?: (string | NexeTarget)[];
     }
 
     export function generateAddonArchive(location: string, options?: ArchiveOptions): Promise<string>;

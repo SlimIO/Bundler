@@ -64,13 +64,14 @@ async function generateAddonArchive(location, options = Object.create(null)) {
  * @param {object} [options] options
  * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
  * @param {string} [options.cwd] current working dir
+ * @param {string | string[]} [options.targets]
  * @returns {Promise<string>}
  */
 async function generateCoreExecutable(location, options = Object.create(null)) {
     argc(location, is.string);
     argc(options, is.plainObject);
 
-    const { debug = false, cwd = process.cwd() } = options;
+    const { debug = false, cwd = process.cwd(), targets } = options;
     argc(debug, is.bool);
     argc(cwd, is.string);
 
@@ -80,15 +81,13 @@ async function generateCoreExecutable(location, options = Object.create(null)) {
         console.log(`agent index.js location: ${input}`);
     }
 
-    // Mkdir cwd
     await mkdir(cwd, { recursive: true });
-
     await nexe.compile({
         input,
         output: "core",
         verbose: true,
         cwd,
-        targets: "windows-x64-10.15.0"
+        targets
     });
 
     return join(cwd, "core.exe");
