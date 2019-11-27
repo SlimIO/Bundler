@@ -18,7 +18,6 @@ const argc = require("@slimio/arg-checker");
 // Require Internal Dependencies
 const { sizeOf } = require("./src/utils");
 
-
 /**
  * @async
  * @function generateAddonArchive
@@ -28,9 +27,6 @@ const { sizeOf } = require("./src/utils");
  * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
  * @param {string} [options.dest] archive destination
  * @returns {Promise<string>}
- *
- * @throws {TypeError}
- * @throws {Error}
  */
 async function generateAddonArchive(location, options = Object.create(null)) {
     argc(location, is.string);
@@ -69,8 +65,6 @@ async function generateAddonArchive(location, options = Object.create(null)) {
  * @param {boolean} [options.debug=false] enable debug (stdout size and location to TTY)
  * @param {string} [options.cwd] current working dir
  * @returns {Promise<string>}
- *
- * @throws {TypeError}
  */
 async function generateCoreExecutable(location, options = Object.create(null)) {
     argc(location, is.string);
