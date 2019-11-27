@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "prepublishOnly": "pkg-ok",
-        "test": "cross-env psp && ava --verbose",
+        "test": "cross-env psp && jest --coverage",
         "doc": "jsdoc -c ./jsdoc.json -r -R ./README.md -P ./package.json --verbose",
         "coverage": "nyc npm test",
         "report": "nyc report --reporter=html"
@@ -47,12 +47,11 @@
         "@escommunity/minami": "^1.0.0",
         "@slimio/eslint-config": "^3.0.3",
         "@slimio/psp": "^0.9.2",
-        "ava": "^2.4.0",
         "cross-env": "^6.0.0",
         "eslint": "^6.4.0",
         "husky": "^3.1.0",
+        "jest": "^24.9.0",
         "jsdoc": "^3.6.2",
-        "nyc": "^14.1.1",
         "pkg-ok": "^2.3.1"
     },
     "engines": {
@@ -64,12 +63,14 @@
             "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
         }
     },
-    "nyc": {
-        "check-coverage": true,
-        "per-file": false,
-        "lines": 98,
-        "statements": 98,
-        "functions": 98,
-        "branches": 90
+    "jest": {
+        "testEnvironment": "node",
+        "testMatch": [
+            "**/test/**/*.js"
+        ],
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "/test/fixtures/"
+        ]
     }
 }
