@@ -9,24 +9,15 @@ const { join } = require("path");
 
 // Require Third-party Dependencies
 const Manifest = require("@slimio/manifest");
-const getDirSize = require("get-dir-size");
 const prettyBytes = require("pretty-bytes");
 const is = require("@slimio/is");
 const nexe = require("nexe");
 const tarball = require("@slimio/tarball");
 const argc = require("@slimio/arg-checker");
 
-/**
- * @async
- * @function
- * @param {!string} location dir location
- * @returns {string}
- */
-async function sizeOf(location) {
-    const sizeInBytes = await getDirSize(location);
+// Require Internal Dependencies
+const { sizeOf } = require("./src/utils");
 
-    return prettyBytes(sizeInBytes);
-}
 
 /**
  * @async
