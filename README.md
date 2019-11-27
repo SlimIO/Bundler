@@ -5,7 +5,8 @@
 ![dep](https://img.shields.io/david/SlimIO/bundler)
 ![size](https://img.shields.io/github/languages/code-size/SlimIO/bundler)
 [![Known Vulnerabilities](https://snyk.io//test/github/SlimIO/bundler/badge.svg?targetFile=package.json)](https://snyk.io//test/github/SlimIO/bundler?targetFile=package.json)
-[![Build Status](https://travis-ci.com/SlimIO/Bundler.svg?branch=master)](https://travis-ci.com/SlimIO/Bundler) [![Greenkeeper badge](https://badges.greenkeeper.io/SlimIO/Bundler.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.com/SlimIO/Bundler.svg?branch=master)](https://travis-ci.com/SlimIO/Bundler)
+[![Greenkeeper badge](https://badges.greenkeeper.io/SlimIO/Bundler.svg)](https://greenkeeper.io/)
 
 SlimIO Archive bundler & Core compiler.
 
